@@ -1,4 +1,4 @@
-package network;
+package app.network;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -12,12 +12,14 @@ public class MulticastPublisher {
 
     public void send(String message) throws IOException {
         socket = new DatagramSocket();
-        group = InetAddress.getByName("230.0.0.0");
+        group = InetAddress.getByName(MulticastReceiver.BROADCAST_ADDRESS);
         buf = message.getBytes();
 
         System.out.println(String.format("Publishing message to multicast group: %s", message));
-        var packet = new DatagramPacket(buf, buf.length, group, 4446);
+
+        var packet = new DatagramPacket(buf, buf.length, group, MulticastReceiver.BROADCAST_PORT);
         socket.send(packet);
+
         socket.close();
     }
 }

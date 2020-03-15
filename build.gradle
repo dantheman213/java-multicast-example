@@ -1,27 +1,20 @@
-apply plugin: 'java'
-apply plugin: 'application'
-
-sourceCompatibility = '1.11'
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-
-if (!hasProperty('mainClass')) {
-    ext.mainClass = 'app.Main'
-}
-
-mainClassName = 'app.Main'
-
-jar {
-    manifest {
-        attributes("Manifest-Version": 1.0,
-        "Class-Path": ".",
-        "Main-Class": "app.Main")
-    }
+plugins {
+    id 'java'
+    id 'application'
 }
 
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.10'
+    testImplementation 'junit:junit:4.12'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'app.Main'
+        )
+    }
 }

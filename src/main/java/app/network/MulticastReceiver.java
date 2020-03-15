@@ -1,26 +1,40 @@
-package network;
+package app.network;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
 
 public class MulticastReceiver extends Thread {
-    protected MulticastSocket socket = null;
-    protected byte[] buf = new byte[256];
+    protected static final String BROADCAST_ADDRESS = "230.0.0.0";
+    protected static final int BROADCAST_PORT = 30000;
+
+    private NetworkInterface networkInterface;
+    private MulticastSocket socket = null;
+    private byte[] buf = new byte[256];
+
+    public MulticastReceiver(NetworkInterface network) {
+            networkInterface = network;
+    }
 
     public void run() {
         try {
             System.out.println("Starting multicast server...");
-            socket = new MulticastSocket(4446);
-            var group = InetAddress.getByName("230.0.0.0");
+
+            socket = new MulticastSocket(BROADCAST_PORT);
+            socket.setInterface(networkInterface.getInterfaceAddresses().get(0).getAddress());
+
+            var group = InetAddress.getByName(BROADCAST_ADDRESS);
             socket.joinGroup(group);
+
             while (true) {
                 var packet = new DatagramPacket(buf, buf.length);
                 socket.receive(packet);
                 var received = new String(packet.getData(), 0, packet.getLength());
+
                 System.out.println(String.format("Client [%s] Message: %s", packet.getAddress(), received));
-                if ("end".equals(received)) {
+                if ("EXIT".equals(received)) {
+                    System.out.println("Received EXIT message. Shutting down receiver.");
                     break;
                 }
             }
